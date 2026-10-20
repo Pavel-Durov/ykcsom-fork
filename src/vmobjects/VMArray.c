@@ -177,7 +177,10 @@ void _VMArray_mark_references(void* _self) {
 //
 // The VTABLE-function
 //
-static VTABLE(VMArray) _VMArray_vtable;
+#ifndef USE_YK
+static
+#endif
+VTABLE(VMArray) _VMArray_vtable;
 bool VMArray_vtable_inited = false;
 
 VTABLE(VMArray)* VMArray_vtable(void) {

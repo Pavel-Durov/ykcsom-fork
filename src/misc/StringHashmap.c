@@ -157,7 +157,10 @@ void _StringHashmap_put(void* _self, pString key, void* value) {
 //
 
 
-static VTABLE(StringHashmapElem) _StringHashmapElem_vtable;
+#ifndef USE_YK
+static
+#endif
+VTABLE(StringHashmapElem) _StringHashmapElem_vtable;
 bool StringHashmapElem_vtable_inited = false;
 
 
@@ -178,7 +181,10 @@ VTABLE(StringHashmapElem)* StringHashmapElem_vtable(void) {
     return &_StringHashmapElem_vtable;
 }
 
-static VTABLE(StringHashmap) _StringHashmap_vtable;
+#ifndef USE_YK
+static
+#endif
+VTABLE(StringHashmap) _StringHashmap_vtable;
 bool StringHashmap_vtable_inited = false;
 
 VTABLE(StringHashmap)* StringHashmap_vtable(void) {

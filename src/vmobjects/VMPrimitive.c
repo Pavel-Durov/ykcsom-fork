@@ -149,7 +149,10 @@ void _VMPrimitive_mark_references(void* _self) {
 //
 
 
-static VTABLE(VMPrimitive) _VMPrimitive_vtable;
+#ifndef USE_YK
+static
+#endif
+VTABLE(VMPrimitive) _VMPrimitive_vtable;
 bool VMPrimitive_vtable_inited = false;
 
 

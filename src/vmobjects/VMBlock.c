@@ -104,7 +104,10 @@ void _VMBlock_mark_references(void* _self) {
 //
 
 
-static VTABLE(VMBlock) _VMBlock_vtable;
+#ifndef USE_YK
+static
+#endif
+VTABLE(VMBlock) _VMBlock_vtable;
 bool VMBlock_vtable_inited = false;
 
 

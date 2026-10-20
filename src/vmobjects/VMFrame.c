@@ -325,7 +325,10 @@ void _VMFrame_mark_references(void* _self) {
 // The VTABLE-function
 //
 //
-static VTABLE(VMFrame) _VMFrame_vtable;
+#ifndef USE_YK
+static
+#endif
+VTABLE(VMFrame) _VMFrame_vtable;
 bool VMFrame_vtable_inited = false;
 
 VTABLE(VMFrame)* VMFrame_vtable(void) {
