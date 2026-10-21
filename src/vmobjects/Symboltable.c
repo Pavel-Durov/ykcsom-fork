@@ -32,7 +32,10 @@ THE SOFTWARE.
 #include <misc/StringHashmap.h>
 
 // class variable
-static pStringHashmap symtab;
+#ifndef USE_YK
+static
+#endif
+pStringHashmap symtab;
 
 pVMSymbol Symbol_table_lookup(pString restrict string) {
     return (pVMSymbol)SEND(symtab, get, string);

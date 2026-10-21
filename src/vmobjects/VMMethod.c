@@ -231,7 +231,10 @@ void _VMMethod_mark_references(void* _self) {
 //
 
 
-static VTABLE(VMMethod) _VMMethod_vtable;
+#ifndef USE_YK
+static
+#endif
+VTABLE(VMMethod) _VMMethod_vtable;
 bool VMMethod_vtable_inited = false;
 
 

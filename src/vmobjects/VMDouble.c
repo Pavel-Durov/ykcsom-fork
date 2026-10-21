@@ -94,7 +94,10 @@ void _VMDouble_mark_references(void* _self) {
 // The VTABLE-function
 //
 //
-static VTABLE(VMDouble) _VMDouble_vtable;
+#ifndef USE_YK
+static
+#endif
+VTABLE(VMDouble) _VMDouble_vtable;
 bool VMDouble_vtable_inited = false;
 
 VTABLE(VMDouble)* VMDouble_vtable(void) {
