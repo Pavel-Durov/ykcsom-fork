@@ -431,7 +431,19 @@ pVMObject Universe_interpret(const char* class_name, const char* method_name) {
 }
 
 
+#ifdef USE_YK
+YkMT* yk_mt = NULL;
+#endif
+
 void Universe_start(int argc, const char** argv) {
+#ifdef USE_YK
+    char* yk_err = NULL;
+    yk_mt = yk_mt_new(&yk_err);
+    if(yk_err != NULL) {
+        debug_error("yk failed to initialise: %s\n", yk_err);
+        exit(ERR_FAIL);
+    }
+#endif
     gc_initialize();
     pVMObject system_object = initialize_object_system();
     pVMMethod bootstrap_method = create_bootstrap_method();
@@ -491,6 +503,9 @@ void Universe_destruct(void) {
     for(size_t i = 0; i < cp_count; i++)
         SEND(class_path[i], free);
     internal_free(class_path);
+#ifdef USE_YK
+    yk_mt_shutdown(yk_mt);
+#endif
 }
 
 

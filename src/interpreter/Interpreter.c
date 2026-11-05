@@ -395,11 +395,39 @@ void Interpreter_initialize(pVMObject nilObject) {
 void Interpreter_start(void) {
     // iterate over the bytecodes
     while(true) {
-        // get the current bytecode index
-        size_t bytecode_index = SEND(_FRAME, get_bytecode_index);
+        // get the current bytecode index and method
+        size_t bytecode_index;
+        pVMMethod method;
+#ifdef USE_YK
+        if(yk_is_interpreting())
+#endif
+        {
+            bytecode_index = SEND(_FRAME, get_bytecode_index);
+            method = Interpreter_get_method();
+        }
+#ifdef USE_YK
+        else {
+            bytecode_index = frame->bytecode_index;
+            method = frame->method;
+        }
+#endif
         // get the current bytecode
-        pVMMethod method = Interpreter_get_method();
-        uint8_t bytecode = SEND(method, get_bytecode, bytecode_index);
+        uint8_t bytecode;
+#ifdef USE_YK
+        // Method entry is the only location: every call starts at bytecode.
+        if(bytecode_index == 0)
+            yk_mt_control_point(yk_mt, &method->ykloc);
+        if(yk_is_interpreting())
+#endif
+        bytecode = SEND(method, get_bytecode, bytecode_index);
+#ifdef USE_YK
+        else {
+            uint8_t* bytecodes = yk_promote(
+                (uint8_t*)&method->fields[method->num_of_fields]);
+            bytecode_index = yk_promote(bytecode_index);
+            bytecode = yk_idempotent_load(&bytecodes[bytecode_index]);
+        }
+#endif
         // get the length of the current bytecode
         int bytecode_length = bytecodes_get_bytecode_length(bytecode);
         
@@ -410,7 +438,14 @@ void Interpreter_start(void) {
         // compute the next bytecode index
         size_t next_bytecode_index = bytecode_index + bytecode_length;
         // update the bytecode index of the frame
+#ifdef USE_YK
+        if(yk_is_interpreting())
+#endif
         SEND(_FRAME, set_bytecode_index, next_bytecode_index);
+#ifdef USE_YK
+        else
+            frame->bytecode_index = next_bytecode_index;
+#endif
         
         // Handle the current bytecode
         switch(bytecode) {

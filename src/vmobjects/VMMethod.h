@@ -34,6 +34,10 @@ THE SOFTWARE.
 
 #include <compiler/GenerationContexts.h>
 
+#ifdef USE_YK
+#include <yk.h>
+#endif
+
 
 #pragma mark VTable definition
 
@@ -70,6 +74,9 @@ VTABLE(VMMethod) {
 struct _VMMethod {
     VTABLE(VMMethod)* _vtable;
     METHOD_FORMAT;
+#ifdef USE_YK
+    YkLocation ykloc;
+#endif
 };
 
 

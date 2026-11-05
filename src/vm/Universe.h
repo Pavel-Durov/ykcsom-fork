@@ -40,6 +40,11 @@ THE SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef USE_YK
+#include <yk.h>
+extern YkMT* yk_mt;
+#endif
+
 /*  Global objects  */
 extern pVMObject nil_object;
 extern pVMObject true_object;

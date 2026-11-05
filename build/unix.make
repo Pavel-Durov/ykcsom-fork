@@ -37,6 +37,17 @@ LDFLAGS		=$(COMPILER_ARCH) $(LIBRARIES)
 
 INSTALL		=install
 
+############# yk JIT
+
+ifneq ($(YK_BUILD_TYPE),)
+YK_CONFIG	?= yk-config
+CC			:= $(shell $(YK_CONFIG) $(YK_BUILD_TYPE) --cc)
+CPPFLAGS	+= $(shell $(YK_CONFIG) $(YK_BUILD_TYPE) --cppflags) -DUSE_YK
+YK_CFLAGS	:= $(shell $(YK_CONFIG) $(YK_BUILD_TYPE) --cflags)
+YK_LDFLAGS	:= $(shell $(YK_CONFIG) $(YK_BUILD_TYPE) --ldflags)
+YK_LIBS		:= $(shell $(YK_CONFIG) $(YK_BUILD_TYPE) --libs)
+endif
+
 CSOM_LIBS	=-ldl
 CORE_LIBS	=-lm
 
@@ -156,7 +167,7 @@ em-awfy: emscripten
 
 
 .c.pic.o:
-	$(CC) $(CFLAGS) -fPIC -c $< -o $*.pic.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) -fPIC -c $< -o $*.pic.o
 
 
 clean:
@@ -185,12 +196,13 @@ core-lib/.gitignore:
 # product rules
 #
 
+$(CSOM_OBJ): CFLAGS += $(YK_CFLAGS)
 
 $(SRC_DIR)/CSOM: $(CSOM_OBJ) CORE
 	@echo Linking CSOM
-	$(CC) $(MAIN_MODULE) $(DBG_FLAGS) $(LDFLAGS) `$(OSTOOL) l`\
+	$(CC) $(MAIN_MODULE) $(DBG_FLAGS) $(OPT_FLAGS) $(LDFLAGS) $(YK_LDFLAGS) `$(OSTOOL) l`\
 		-o `$(OSTOOL) x "$(CSOM_NAME)"` \
-		$(CSOM_OBJ) $(CSOM_LIBS)
+		$(CSOM_OBJ) $(CSOM_LIBS) $(YK_LIBS)
 	@echo CSOM done.
 
 CORE: core-lib/.gitignore $(PRIMITIVES_OBJ)
