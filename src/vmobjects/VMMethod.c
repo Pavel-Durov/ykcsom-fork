@@ -115,6 +115,9 @@ void _VMMethod_init(void* _self, ...) {
     va_end(args);
     
     self->number_of_arguments = Signature_get_number_of_arguments(self->signature);
+#ifdef USE_YK
+    self->ykloc = yk_location_new();
+#endif
 }
 
 
