@@ -76,6 +76,7 @@ struct _VMMethod {
     METHOD_FORMAT;
 #ifdef USE_YK
     YkLocation ykloc;
+    bool       called;
 #endif
 };
 

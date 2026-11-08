@@ -116,7 +116,8 @@ void _VMMethod_init(void* _self, ...) {
     
     self->number_of_arguments = Signature_get_number_of_arguments(self->signature);
 #ifdef USE_YK
-    self->ykloc = yk_location_new();
+    self->ykloc = yk_location_null();
+    self->called = false;
 #endif
 }
 
@@ -215,6 +216,16 @@ void _VMMethod_set_bytecode(void* _self, size_t index, uint8_t value) {
 
 void _VMMethod_invoke_method(void* _self, pVMFrame frame) {
     pVMMethod self = (pVMMethod)_self;
+#ifdef USE_YK
+    // A send that finds the method already active is a recursive call, so
+    // give the method's entry a location.
+    if (yk_is_interpreting()) {
+        if (!self->called)
+            self->called = true;
+        else if (yk_location_is_null(self->ykloc))
+            self->ykloc = yk_location_new();
+    }
+#endif
     // Allocate and push a new frame on the interpreter stack
     pVMFrame frm = Interpreter_push_new_frame(self, (pVMFrame) nil_object);
     SEND(frm, copy_arguments_from, frame);

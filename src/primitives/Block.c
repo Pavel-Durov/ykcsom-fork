@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include <vmobjects/VMObject.h>
 #include <vmobjects/VMFrame.h>
+#include <vmobjects/VMMethod.h>
 
 #include <vm/Universe.h>
 
@@ -48,6 +49,15 @@ void  _Block_value_with_(pVMObject object, pVMFrame frame) {
 
 
 void  _Block_restart(pVMObject object, pVMFrame frame) {
+#ifdef USE_YK
+    // restart is the back edge of whileTrue:, which every built-in loop
+    // (whileFalse:, to:do:, timesRepeat:, ...) bottoms out in. Its target,
+    // bytecode 0 of the looping method, is the loop header.
+    // ponytail: one location per looping method, so all loops share
+    // whileTrue:'s; key locations by call site if traces thrash.
+    if (yk_is_interpreting() && yk_location_is_null(frame->method->ykloc))
+        frame->method->ykloc = yk_location_new();
+#endif
     SEND(frame, set_bytecode_index, 0);
     SEND(frame, reset_stack_pointer);    
 }

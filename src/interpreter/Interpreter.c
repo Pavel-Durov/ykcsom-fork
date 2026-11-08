@@ -64,6 +64,9 @@ static pVMFrame pop_frame(void) {
 
     // Destroy the previous pointer on the old top frame
     SEND(result, clear_previous_frame);
+#ifdef USE_YK
+    result->method->called = false;
+#endif
 
     // Return the popped frame
     return result;
@@ -414,7 +417,8 @@ void Interpreter_start(void) {
         // get the current bytecode
         uint8_t bytecode;
 #ifdef USE_YK
-        // Method entry is the only location: every call starts at bytecode.
+        // Locations live only at method entry, and are non-null only for
+        // recursive methods and loops (see VMMethod.h).
         if(bytecode_index == 0)
             yk_mt_control_point(yk_mt, &method->ykloc);
         if(yk_is_interpreting())
