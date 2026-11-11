@@ -86,6 +86,17 @@ static void pop_frame_and_push_result(pVMObject result) {
 }
 
 
+#ifdef USE_YK
+#define NOOPT_VAL(X) asm volatile("" : "+r,m"(X) : : "memory");
+
+__attribute__((yk_idempotent, noinline))
+static uintptr_t idempotent_lookup_invokable(pVMClass cls, pVMSymbol signature) {
+    NOOPT_VAL(cls);
+    return (uintptr_t)SEND(cls, lookup_invokable, signature);
+}
+#endif
+
+
 static void send(pVMSymbol signature, pVMClass receiver_class) {
     // Lookup the invokable with the given signature
     pVMObject invokable = (pVMObject)SEND(receiver_class,
@@ -276,6 +287,16 @@ static void do_send(size_t bytecode_index) {
     pVMObject receiver =
         SEND(_FRAME, get_stack_element, number_of_arguments - 1);
 
+#ifdef USE_YK
+    pVMClass receiver_class = yk_promote(receiver->class);
+    signature = yk_promote(signature);
+    pVMObject invokable =
+        (pVMObject)idempotent_lookup_invokable(receiver_class, signature);
+    if(invokable != NULL) {
+        TSEND(VMInvokable, invokable, invoke, _FRAME);
+        return;
+    }
+#endif
     // Send the message
     send(signature, SEND(receiver, get_class));
 }
