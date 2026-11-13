@@ -94,6 +94,25 @@ static uintptr_t idempotent_lookup_invokable(pVMClass cls, pVMSymbol signature) 
     NOOPT_VAL(cls);
     return (uintptr_t)SEND(cls, lookup_invokable, signature);
 }
+
+__attribute__((yk_idempotent, noinline))
+static int64_t idempotent_lookup_field_index(pVMClass cls, pVMSymbol name) {
+    NOOPT_VAL(cls);
+    // `SEND` written out. This is only idempotent because
+    // `lookup_field_index` guarantees not to change state, and a
+    // class fields never change after it is created.
+    return cls->_vtable->lookup_field_index(cls, name);
+}
+#endif
+
+
+#ifdef USE_YK
+#define FIELD_INDEX_OF(self, field_name) \
+    idempotent_lookup_field_index(yk_promote((self)->class), \
+                                  yk_promote(field_name))
+#else
+#define FIELD_INDEX_OF(self, field_name) \
+    SEND((self), get_field_index, (field_name))
 #endif
 
 
@@ -176,7 +195,7 @@ static void do_push_field(size_t bytecode_index) {
     
     // Get the field index from the field name
     pVMObject self = _SELF;
-    int64_t field_index = SEND(self, get_field_index, field_name);
+    int64_t field_index = FIELD_INDEX_OF(self, field_name);
     
     pVMObject o = SEND(self, get_field, field_index);
     // Push the field with the computed index onto the stack
@@ -266,7 +285,7 @@ static void do_pop_field(size_t bytecode_index) {
                 
     // Get the field index from the field name
     pVMObject self = _SELF;
-    int64_t field_index = SEND(self, get_field_index, field_name);
+    int64_t field_index = FIELD_INDEX_OF(self, field_name);
     
     // Set the field with the computed index to the value popped from the stack
     pVMObject o = SEND(_FRAME, pop);
