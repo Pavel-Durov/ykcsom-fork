@@ -98,17 +98,21 @@ static uintptr_t idempotent_lookup_invokable(pVMClass cls, pVMSymbol signature) 
 __attribute__((yk_idempotent, noinline))
 static int64_t idempotent_lookup_field_index(pVMClass cls, pVMSymbol name) {
     NOOPT_VAL(cls);
+    NOOPT_VAL(name);
     // `SEND` written out. This is only idempotent because
     // `lookup_field_index` guarantees not to change state, and a
     // class fields never change after it is created.
     return cls->_vtable->lookup_field_index(cls, name);
 }
 
+extern pHashmapElem primitiveGetElem(pHashmap self, void* key);
+
 __attribute__((yk_idempotent, noinline))
-static uintptr_t idempotent_get_global(pVMSymbol name, uintptr_t version) {
+static pHashmapElem idempotent_get_global(pVMSymbol name) {
     NOOPT_VAL(name);
-    NOOPT_VAL(version);
-    return (uintptr_t)Universe_get_global(name);
+    // This is a safe idempotent because the global variable stays the same instance
+    // for the lifetime of the process. The value may change, but the element itself will not.
+    return primitiveGetElem(Universe_get_globals_dictionary(), name);
 }
 #endif
 
@@ -242,10 +246,10 @@ static void do_push_global(size_t bytecode_index) {
         
     // Get the global from the Universe
 #ifdef USE_YK
-    pVMObject global = (pVMObject)idempotent_get_global(
-        yk_promote(global_name), yk_promote(globals_version));
-    if(global == NULL)
-        global = Universe_get_global(global_name);
+    // Promote the name but not the value, so the value is loaded each time.
+    // A NULL element means the global did not exist yet, which can change.
+    pHashmapElem elem = idempotent_get_global(yk_promote(global_name));
+    pVMObject global = elem ? elem->value : Universe_get_global(global_name);
 #else
     pVMObject global = Universe_get_global(global_name);
 #endif
