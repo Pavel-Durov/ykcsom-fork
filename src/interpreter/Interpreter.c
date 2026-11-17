@@ -246,8 +246,6 @@ static void do_push_global(size_t bytecode_index) {
         
     // Get the global from the Universe
 #ifdef USE_YK
-    // Promote the name but not the value, so the value is loaded each time.
-    // A NULL element means the global did not exist yet, which can change.
     pHashmapElem elem = idempotent_get_global(yk_promote(global_name));
     pVMObject global = elem ? elem->value : Universe_get_global(global_name);
 #else
