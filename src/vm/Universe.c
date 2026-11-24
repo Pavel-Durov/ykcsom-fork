@@ -114,6 +114,9 @@ size_t cp_count=0;
 static
 #endif
 pHashmap globals_dictionary=NULL;
+#ifdef USE_YK
+uint64_t globals_version=0;
+#endif
 
 ///////////////////////////////////
 #pragma mark private hepler functions
@@ -795,6 +798,10 @@ pVMObject Universe_get_global(pVMSymbol name) {
 
 void Universe_set_global(pVMSymbol name, pVMObject value) {
     // Insert the given value into the dictionary of globals
+#ifdef USE_YK
+    if(Universe_has_global(name))
+        globals_version++;
+#endif
     SEND(globals_dictionary, put, name, value);
 }
 

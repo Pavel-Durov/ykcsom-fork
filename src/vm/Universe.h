@@ -114,6 +114,9 @@ pHashmap      Universe_get_globals_dictionary(void);
 pVMObject     Universe_get_global(pVMSymbol);
 void          Universe_set_global(pVMSymbol, pVMObject);
 bool          Universe_has_global(pVMSymbol);
+#ifdef USE_YK
+extern uint64_t globals_version;
+#endif
 
 pVMClass      Universe_get_block_class(void);
 pVMClass      Universe_get_block_class_with_args(int64_t);
