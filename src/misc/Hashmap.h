@@ -127,6 +127,9 @@ struct _Hashmap {
 
 
 pHashmap Hashmap_new(void);
+#ifdef USE_YK
+pHashmapElem primitiveGetElem(pHashmap self, void* key);
+#endif
 
 
 #pragma mark vtable initialization

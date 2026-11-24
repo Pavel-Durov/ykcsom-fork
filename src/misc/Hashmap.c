@@ -154,6 +154,25 @@ void* primitiveGet(pHashmap self, void* key, size_t start) {
 }
 
 
+#ifdef USE_YK
+// As `primitiveGet`, but return the element rather than the element's value.
+pHashmapElem primitiveGetElem(pHashmap self, void* key) {
+    size_t start = hashf(self, ((pOOObject)key)->hash);
+    size_t slot = start;
+    do {
+        if(!self->elems[slot]) // NULL entry -> key not found
+            return NULL;
+        if(SEND(self->elems[slot], key_equal_to, key))
+            return self->elems[slot];
+        slot++;
+        if(slot == self->size)
+            slot = 0;
+    } while(slot != start);
+    return NULL;
+}
+#endif
+
+
 /**
  * Get an element from a hash map
  */
