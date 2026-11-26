@@ -56,4 +56,4 @@ cd ..
 
 # Build with Yk and run tests.
 make YK_BUILD_TYPE=debug YK_CONFIG="$(pwd)/yk/bin/yk-config"
-YKD_SERIALISE_COMPILATION=1 YK_HOT_THRESHOLD=1 ./CSOM -cp Smalltalk TestSuite/TestHarness.som
+YK_SIDETRACE_THRESHOLD=1 YKD_SERIALISE_COMPILATION=1 YK_HOT_THRESHOLD=1 ./CSOM -cp Smalltalk TestSuite/TestHarness.som
