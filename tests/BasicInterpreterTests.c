@@ -45,9 +45,9 @@ static const Test tests[] = {
     {"Blocks", "testArg2", (void*) 77, INTEGER},
     {"Blocks", "testArgAndLocal",   (void*) 8, INTEGER},
     {"Blocks", "testArgAndContext", (void*) 8, INTEGER},
-    {"Blocks", "testEmptyZeroArg", 1, INTEGER},
-    {"Blocks", "testEmptyOneArg", 1, INTEGER},
-    {"Blocks", "testEmptyTwoArg", 1, INTEGER},
+    {"Blocks", "testEmptyZeroArg", (void*) 1, INTEGER},
+    {"Blocks", "testEmptyOneArg", (void*) 1, INTEGER},
+    {"Blocks", "testEmptyTwoArg", (void*) 1, INTEGER},
 
     {"Return", "testReturnSelf", "Return", CLASS},
     {"Return", "testReturnSelfImplicitly", "Return", CLASS},
@@ -101,8 +101,8 @@ static const Test tests[] = {
 
     {"Regressions", "testSymbolEquality", (void*) 1, INTEGER},
     {"Regressions", "testSymbolReferenceEquality", (void*) 1, INTEGER},
-    {"Regressions", "testUninitializedLocal", 1, INTEGER},
-    {"Regressions", "testUninitializedLocalInBlock", 1, INTEGER},
+    {"Regressions", "testUninitializedLocal", (void*) 1, INTEGER},
+    {"Regressions", "testUninitializedLocalInBlock", (void*) 1, INTEGER},
 
     {"BinaryOperation", "test", (void*) 11, INTEGER},
 
